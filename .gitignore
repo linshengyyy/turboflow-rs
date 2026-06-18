@@ -1,0 +1,23 @@
+/target
+Cargo.lock
+*.rs.bk
+
+# 凭证文件
+auth.json
+*.env
+.env
+config.json
+credentials*
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# 日志
+*.log

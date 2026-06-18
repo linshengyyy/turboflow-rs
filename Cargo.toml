@@ -1,0 +1,19 @@
+[package]
+name = "turboflow"
+version = "0.1.0"
+edition = "2021"
+authors = ["Turboflow SDK Contributors"]
+description = "Turboflow event contract trading SDK in Rust"
+license = "MIT"
+repository = "https://github.com/yourname/turboflow-rs"
+
+[dependencies]
+reqwest = { version = "0.12", features = ["json", "blocking"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+base64 = "0.22"
+chrono = "0.4"
+thiserror = "1.0"
+
+[dev-dependencies]
+anyhow = "1.0"
