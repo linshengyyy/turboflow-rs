@@ -36,23 +36,23 @@ fn read_first_env(keys: &[&str]) -> Option<String> {
 }
 
 fn resolve_credentials(token: Option<&str>, user_id: Option<&str>) -> (Option<String>, Option<String>) {
-    let resolved_token = normalize_token(token)
-        .is_empty()
-        .then(|| read_first_env(TOKEN_ENV_KEYS))
-        .flatten()
-        .or_else(|| Some(normalize_token(token)).filter(|s| !s.is_empty()));
+    let normalized = normalize_token(token);
+    let resolved_token = if normalized.is_empty() {
+        read_first_env(TOKEN_ENV_KEYS)
+    } else {
+        Some(normalized)
+    };
 
     let resolved_user_id = user_id
         .map(str::trim)
         .filter(|s| !s.is_empty())
         .map(str::to_string)
-        .or_else(|| read_first_env(USER_ID_ENV_KEYS));
-
-    let resolved_user_id = resolved_user_id.or_else(|| {
-        resolved_token
-            .as_deref()
-            .and_then(|t| infer_user_id_from_token(t))
-    });
+        .or_else(|| read_first_env(USER_ID_ENV_KEYS))
+        .or_else(|| {
+            resolved_token
+                .as_deref()
+                .and_then(infer_user_id_from_token)
+        });
 
     (resolved_token, resolved_user_id)
 }
@@ -337,6 +337,13 @@ impl TurboflowTrader {
             .post(format!("{}/account/pm/order/submit", self.base_url))
             .json(&payload)
             .send()?.json()?;
+
+        if !is_success_code(resp.errno.as_deref()) {
+            return Err(Error::Api {
+                errno: resp.errno.unwrap_or_else(|| "unknown".to_string()),
+                msg: resp.msg.unwrap_or_else(|| "no message".to_string()),
+            });
+        }
 
         Ok(resp.data.unwrap_or_default().as_object().cloned().unwrap_or_default())
     }

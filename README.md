@@ -2,13 +2,15 @@
 
 Turboflow 事件合约接口逆向（Rust SDK），利用 API 下单，可实现批量化、自动化交易；项目仅供学习交流使用，请勿用于非法用途，否则后果自负。
 
-Turboflow 使用 Privy 邮箱验证码登录，登录后获取 JWT Token 进行接口调用。
+Turboflow 使用 JWT Token 进行接口调用，Token 通过 `Authorization: Bearer <token>` header 传递，同时需要 `uid` header 传用户 ID。
 
 ## 认证
 
-Web 端使用 Privy 邮箱验证码登录，获取 JWT Token。Token 通过 `Authorization: Bearer <token>` header 传递，同时需要 `uid` header 传用户 ID。
-
-凭证可通过浏览器开发者工具获取（F12 → Network → 任意请求的 Request Headers），也可通过 SDK 的登录流程自动获取。
+凭证通过浏览器开发者工具获取：
+1. 登录 `https://turboflow.xyz`
+2. F12 → Network → 任意 API 请求
+3. 复制 Request Headers 中的 `Authorization`（去掉 `Bearer ` 前缀）和 `uid`
+4. 保存到 `auth.json` 或设置环境变量
 
 SDK 支持两种认证方式：
 1. `auth.json` 文件持久化（推荐）
@@ -30,7 +32,7 @@ uid: <user_id>
   "duration": 3600,
   "order_way": 1,
   "pair_id": "6",
-  "pool_id": 0,
+  "pool_id": 1,
   "coin_code": "1",
   "return_rate": 85
 }
@@ -44,7 +46,7 @@ uid: <user_id>
 | `order_way` | i32 | `1` = 看涨（Higher），`2` = 看跌（Lower） |
 | `amount` | string | 下单金额（USDT），最低 2.0 |
 | `return_rate` | f64 | 赔率百分比（如 85 表示 85%），可选，不填则用默认值 |
-| `pool_id` | i64 | 抵押池 ID，默认 `0` |
+| `pool_id` | i64 | 抵押池 ID，默认 `1` |
 | `coin_code` | string | 币种，USDT 固定 `"1"` |
 
 **赔率说明：** 赔率影响盈亏计算。例如赔率 85%，下注 10 USDT，赢了获得 10 + 10×0.85 = 18.5 USDT，输了损失 10 USDT。赔率越高，潜在收益越高但胜率可能越低。赔率随市场波动实时变化，建议通过 `/public/pm/config` 接口获取当前可用赔率。
@@ -247,23 +249,6 @@ let positions = trader.get_positions()?;
 let history = trader.get_order_history(1, 20)?;
 ```
 
-### 验证码登录
-
-```rust
-use turboflow::TurboflowLogin;
-
-let login = TurboflowLogin::new();
-
-// 发送验证码
-login.send_code("your_email@example.com")?;
-
-// 验证码验证，获取 token
-let auth = login.verify_code("your_email@example.com", "123456")?;
-
-// 保存凭证到 auth.json
-turboflow::save_auth(&auth.token, &auth.user_id, &auth.email)?;
-```
-
 ### 环境变量认证
 
 ```bash
@@ -277,18 +262,11 @@ let trader = TurboflowTrader::new(None, None)?;
 
 ### 获取凭证
 
-有两种方式获取凭证：
-
-**方式一：浏览器开发者工具**
+通过浏览器开发者工具获取：
 1. 登录 `https://turboflow.xyz`
 2. F12 → Network → 任意 API 请求
 3. 复制 Request Headers 中的 `Authorization`（去掉 `Bearer ` 前缀）和 `uid`
 4. 保存到 `auth.json` 或设置环境变量
-
-**方式二：SDK 登录流程**
-1. 调用 `TurboflowLogin::send_code()` 发送邮箱验证码
-2. 调用 `TurboflowLogin::verify_code()` 验证并获取 token
-3. SDK 自动保存到 `auth.json`
 
 ## 构建
 
@@ -310,7 +288,5 @@ turboflow-rs/
     ├── auth.rs       # 认证模块（加载/保存凭证）
     ├── login.rs      # 登录模块（邮箱验证码）
     ├── trader.rs     # 交易模块（下单/查询）
-    ├── config.rs     # 配置管理
-    ├── totp.rs       # TOTP 验证码
     └── utils.rs      # 工具函数
 ```

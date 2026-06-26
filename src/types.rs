@@ -107,7 +107,7 @@ pub struct PlaceOrderRequest {
 }
 
 /// 默认 USDT 抵押池 pool_id
-pub const DEFAULT_POOL_ID: i32 = 0;
+pub const DEFAULT_POOL_ID: i32 = 1;
 
 /// 事件合约方向
 pub const ORDER_WAY_HIGHER: i32 = 1;
@@ -162,7 +162,7 @@ impl EventContract {
                 pair_id: BTC_USDT_PAIR_ID,
                 pair_name: "BTC/USDT",
                 enabled: true,
-                durations: &[DURATION_30S, DURATION_60S, DURATION_5M],
+                durations: &[DURATION_30S, DURATION_60S, DURATION_3M, DURATION_5M, DURATION_10M, DURATION_15M, DURATION_1H],
                 order_configs: &[
                     DurationConfig { duration: DURATION_30S, ask_return_rate: 0.872, bid_return_rate: 0.887_662, min_amount: 2.0, max_amount: 200.0 },
                     DurationConfig { duration: DURATION_60S, ask_return_rate: 0.868, bid_return_rate: 0.870_907, min_amount: 2.0, max_amount: 200.0 },
@@ -177,7 +177,7 @@ impl EventContract {
                 pair_id: ETH_USDT_PAIR_ID,
                 pair_name: "ETH/USDT",
                 enabled: true,
-                durations: &[DURATION_30S, DURATION_60S, DURATION_5M],
+                durations: &[DURATION_30S, DURATION_60S, DURATION_3M, DURATION_5M, DURATION_10M, DURATION_15M, DURATION_1H],
                 order_configs: &[
                     DurationConfig { duration: DURATION_30S, ask_return_rate: 0.891, bid_return_rate: 0.809, min_amount: 2.0, max_amount: 200.0 },
                     DurationConfig { duration: DURATION_60S, ask_return_rate: 0.882, bid_return_rate: 0.820_001, min_amount: 2.0, max_amount: 200.0 },
@@ -192,7 +192,7 @@ impl EventContract {
                 pair_id: XAU_USDT_PAIR_ID,
                 pair_name: "XAU/USDT",
                 enabled: true,
-                durations: &[DURATION_60S, DURATION_5M, DURATION_15M],
+                durations: &[DURATION_60S, DURATION_3M, DURATION_5M, DURATION_10M, DURATION_15M, DURATION_1H],
                 order_configs: &[
                     DurationConfig { duration: DURATION_60S, ask_return_rate: 0.8, bid_return_rate: 0.8, min_amount: 2.0, max_amount: 200.0 },
                     DurationConfig { duration: DURATION_3M, ask_return_rate: 0.8, bid_return_rate: 0.8, min_amount: 2.0, max_amount: 400.0 },
